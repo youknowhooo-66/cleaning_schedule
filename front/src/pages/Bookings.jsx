@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../services/api";
 import BookingForm from "../components/BookingForm";
 import { toast } from "react-toastify";
@@ -6,7 +7,6 @@ import { toast } from "react-toastify";
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [cleaners, setCleaners] = useState([]);
-  const [editando, setEditando] = useState(null);
 
   async function carregarDados() {
     try {
@@ -27,17 +27,8 @@ export default function Bookings() {
 
   async function salvar(booking) {
     try {
-      if (editando) {
-        // O backend atual por enquanto só tem updateStatus, mas vamos simular um update completo se necessário
-        // ou apenas chamar o que temos. Vou usar o status se for apenas status.
-        // Se quisermos CRUD completo, o ideal seria ter um PUT /api/booking/:id
-        await api.patch(`/booking/${editando.id}/status`, { status: booking.status || "PENDING" });
-        toast.success("Status atualizado!");
-      } else {
-        await api.post("/booking", booking);
-        toast.success("Agendamento criado!");
-      }
-      setEditando(null);
+      await api.post("/booking", booking);
+      toast.success("Agendamento criado!");
       carregarDados();
     } catch (error) {
       toast.error("Erro ao salvar agendamento");
@@ -72,24 +63,15 @@ export default function Bookings() {
         <h1 className="text-3xl font-bold text-gray-800">Agendamentos de Limpeza</h1>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow">
+      {/* <div className="bg-white p-6 rounded-2xl shadow">
         <h2 className="text-xl font-semibold mb-4">
-          {editando ? "Editar Agendamento" : "Novo Agendamento"}
+          Novo Agendamento
         </h2>
         <BookingForm
           onSubmit={salvar}
-          bookingSelecionado={editando}
           cleaners={cleaners}
         />
-        {editando && (
-          <button
-            onClick={() => setEditando(null)}
-            className="mt-2 text-gray-500 hover:underline"
-          >
-            Cancelar Edição
-          </button>
-        )}
-      </div>
+      </div> */}
 
       <div className="bg-white rounded-2xl shadow overflow-hidden">
         <table className="w-full text-left">
@@ -110,7 +92,7 @@ export default function Bookings() {
                   <div className="text-xs text-gray-500">{b.clientEmail}</div>
                 </td>
                 <td className="p-4 text-gray-600">
-                  {new Date(b.serviceDate).toLocaleDateString()}
+                  {new Date(b.serviceDate).toLocaleString()}
                 </td>
                 <td className="p-4 text-gray-600">
                   {b.cleaner?.name || "Não atribuído"}
@@ -133,12 +115,12 @@ export default function Bookings() {
                   </select>
                 </td>
                 <td className="p-4 space-x-2">
-                  <button
-                    onClick={() => setEditando(b)}
+                  <Link
+                    to={`/bookings/edit/${b.id}`}
                     className="px-3 py-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg transition"
                   >
                     Editar
-                  </button>
+                  </Link>
                   <button
                     onClick={() => deletar(b.id)}
                     className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition"

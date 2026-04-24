@@ -12,10 +12,15 @@ export default function BookingForm({ onSubmit, bookingSelecionado, cleaners }) 
 
   useEffect(() => {
     if (bookingSelecionado) {
+      // Cria a data local ajustando o timezone
+      const date = new Date(bookingSelecionado.serviceDate);
+      const tzoffset = date.getTimezoneOffset() * 60000; // offset em milissegundos
+      const localISOTime = (new Date(date - tzoffset)).toISOString().slice(0, 16);
+      
       setForm({
         clientName: bookingSelecionado.clientName || "",
         clientEmail: bookingSelecionado.clientEmail || "",
-        serviceDate: bookingSelecionado.serviceDate ? new Date(bookingSelecionado.serviceDate).toISOString().split('T')[0] : "",
+        serviceDate: localISOTime,
         notes: bookingSelecionado.notes || "",
         cleanerId: bookingSelecionado.cleanerId || "",
       });
@@ -67,10 +72,10 @@ export default function BookingForm({ onSubmit, bookingSelecionado, cleaners }) 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Data do Serviço</label>
+          <label className="block text-sm font-medium text-gray-700">Data e Hora do Serviço</label>
           <input
             name="serviceDate"
-            type="date"
+            type="datetime-local"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             value={form.serviceDate}
             onChange={handleChange}
@@ -84,6 +89,7 @@ export default function BookingForm({ onSubmit, bookingSelecionado, cleaners }) 
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             value={form.cleanerId}
             onChange={handleChange}
+            required
           >
             <option value="">Selecione um profissional</option>
             {cleaners.map((c) => (

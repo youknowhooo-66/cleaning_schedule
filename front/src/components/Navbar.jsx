@@ -14,7 +14,9 @@ export default function Navbar() {
       <div className="flex space-x-6">
         <Link to="/dashboard" className="text-blue-600 font-bold text-xl">CleaningSchedule</Link>
         <Link to="/bookings" className="text-gray-600 hover:text-blue-600">Agendamentos</Link>
+        <Link to="/bookings/new" className="text-gray-600 hover:text-blue-600">Novo Agendamento</Link>
         <Link to="/admin" className="text-gray-600 hover:text-blue-600">Usuários</Link>
+        <Link to="/admin/cleaners" className="text-gray-600 hover:text-blue-600">Profissionais</Link>
       </div>
       <button 
         onClick={handleLogout}

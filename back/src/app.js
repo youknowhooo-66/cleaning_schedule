@@ -13,11 +13,8 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/cleaner', cleanerRoutes);
 app.use('/api/usuario', usuarioRouter);
 
-
-app.use('/api', usuarioRouter);
-
-app.get('/', (req, res) => {
-  res.send('Cleaning Schedule API is running');
-});
+// app.get('/', (req, res) => {
+//   res.send('Cleaning Schedule API is running');
+// });
 
 export default app;

@@ -2,12 +2,12 @@ import { Router } from "express";
 import { criarUsuario, 
          loginUsuario,
          esqueciSenha,
-         resetarSenha
-         } from "../controllers/UsuariosController.js";
-import { buscarUsuario,
+         resetarSenha,
+         buscarUsuario,
          listarUsuarios,
          atualizarUsuario,
-         deletarUsuario } from "../controllers/UserController.js"
+         deletarUsuario 
+         } from "../controllers/UsuariosController.js"
 
 export const usuarioRouter = Router();
 

@@ -3,6 +3,7 @@ import crypto from "crypto";
 import prisma from "../config/prisma.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 
+// User Creation & Authentication
 export async function criarUsuario(req, res) {
   try {
     console.log("📥 Requisição recebida em /usuarios:", req.body);
@@ -178,3 +179,79 @@ export async function resetarSenha(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+
+// User Management CRUD (Consolidated from UserController.js)
+export const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await prisma.usuario.findMany({
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        ativo: true,
+        tipoUsuario: true
+      },
+      where: { ativo: true } // Only fetch active users
+    });
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const buscarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: Number(id) }
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const atualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome, email, senha, ativo, tipoUsuario } = req.body;
+
+    let data = { nome, email, ativo, tipoUsuario };
+
+    if (senha) {
+      // Hash the password only if a new one is provided
+      data.senha = await bcrypt.hash(senha, 10);
+    }
+
+    const usuario = await prisma.usuario.update({
+      where: { id: Number(id) },
+      data
+    });
+
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deletarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Soft delete: update the 'ativo' field to false
+    await prisma.usuario.update({
+      where: { id: Number(id) },
+      data: { ativo: false }
+    });
+
+    res.json({ message: 'Usuário desativado com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

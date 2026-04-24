@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import UsuarioForm from "../components/UsuarioForm/UsuarioForm";
+import { Link } from "react-router-dom";
 import { api } from "../services/api";
 import { toast } from "react-toastify";
 
 export default function Admin() {
   const [usuarios, setUsuarios] = useState([]);
-  const [editando, setEditando] = useState(null);
 
   async function carregarUsuarios() {
     try {
@@ -20,36 +19,16 @@ export default function Admin() {
     carregarUsuarios();
   }, []);
 
-  async function salvar(usuario) {
-    try {
-      if (editando) {
-        await api.put(`/usuario/${editando.id}`, usuario);
-        toast.success("Usuário atualizado com sucesso!");
-        setEditando(null);
-      } else {
-        await api.post("/usuario/register", usuario);
-        toast.success("Usuário criado com sucesso!");
-      }
-      carregarUsuarios();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Erro ao salvar usuário");
-    }
-  }
-
   async function deletar(id) {
     if (window.confirm("Deseja realmente excluir este usuário?")) {
       try {
         await api.delete(`/usuario/${id}`);
-        toast.success("Usuário excluído com sucesso!");
+        toast.success("Usuário desativado com sucesso!");
         carregarUsuarios();
       } catch (error) {
         toast.error("Erro ao excluir usuário");
       }
     }
-  }
-
-  function editar(usuario) {
-    setEditando(usuario);
   }
 
   return (
@@ -59,25 +38,6 @@ export default function Admin() {
           Gerenciamento de Usuários
         </h1>
         <p className="text-gray-500">Adicione, edite ou remova usuários do sistema</p>
-      </div>
-
-      <div className="bg-white p-6 rounded-2xl shadow">
-        <h2 className="text-xl font-semibold mb-4">
-          {editando ? "Editar Usuário" : "Novo Usuário"}
-        </h2>
-
-        <UsuarioForm
-          onSubmit={salvar}
-          usuarioSelecionado={editando}
-        />
-        {editando && (
-          <button
-            onClick={() => setEditando(null)}
-            className="mt-2 text-gray-500 hover:underline"
-          >
-            Cancelar Edição
-          </button>
-        )}
       </div>
 
       <div className="bg-white rounded-2xl shadow overflow-hidden">
@@ -119,12 +79,12 @@ export default function Admin() {
                 </td>
 
                 <td className="p-4 space-x-2">
-                  <button
-                    onClick={() => editar(u)}
+                  <Link
+                    to={`/admin/edit/${u.id}`}
                     className="px-3 py-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg transition"
                   >
                     Editar
-                  </button>
+                  </Link>
 
                   <button
                     onClick={() => deletar(u.id)}
