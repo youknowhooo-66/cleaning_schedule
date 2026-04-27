@@ -1,29 +1,108 @@
-import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../utils/auth";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { logout, getUser } from "../utils/auth";
+import { Sparkles, PlusCircle, Users, Briefcase, LogOut, LayoutDashboard, CalendarDays } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const user = getUser();
+  
+  const isAdmin = user && (user.usuario?.tipoUsuario === "ADMIN" || user.tipoUsuario === "ADMIN");
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      <div className="flex space-x-6">
-        <Link to="/dashboard" className="text-blue-600 font-bold text-xl">CleaningSchedule</Link>
-        <Link to="/bookings" className="text-gray-600 hover:text-blue-600">Agendamentos</Link>
-        <Link to="/bookings/new" className="text-gray-600 hover:text-blue-600">Novo Agendamento</Link>
-        <Link to="/admin" className="text-gray-600 hover:text-blue-600">Usuários</Link>
-        <Link to="/admin/cleaners" className="text-gray-600 hover:text-blue-600">Profissionais</Link>
-      </div>
-      <button 
-        onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
-      >
-        Sair
-      </button>
-    </nav>
+    <div className="pt-6 pb-2 px-4 sm:px-6 lg:px-8">
+      <nav className="max-w-7xl mx-auto bg-white/80 backdrop-blur-md border border-brand-100 shadow-sm rounded-full sticky top-6 z-50 transition-all">
+        <div className="px-6 h-16 flex justify-between items-center">
+          <div className="flex items-center gap-8">
+            <Link to="/dashboard" className="text-brand-900 font-extrabold text-xl tracking-tight flex items-center gap-2 group">
+              <div className="w-10 h-10 bg-gradient-to-tr from-brand-600 to-brand-400 rounded-full flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:rotate-12 transition-transform">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="hidden sm:block">SchedulePro</span>
+            </Link>
+
+            <div className="hidden lg:flex space-x-1">
+              <Link
+                to="/dashboard"
+                className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                  isActive("/dashboard")
+                    ? "bg-brand-50 text-brand-700 shadow-sm"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-brand-600"
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Visão Geral
+              </Link>
+              <Link
+                to="/bookings/new"
+                className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                  isActive("/bookings/new")
+                    ? "bg-accent-50 text-accent-600 shadow-sm"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-accent-600"
+                }`}
+              >
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Nova Limpeza
+              </Link>
+              <Link
+                to="/bookings"
+                className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                  isActive("/bookings")
+                    ? "bg-brand-50 text-brand-700 shadow-sm"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-brand-600"
+                }`}
+              >
+                <CalendarDays className="w-4 h-4 mr-2" />
+                Sua Agenda
+              </Link>
+              {isAdmin && (
+                <>
+                  <Link
+                    to="/admin"
+                    className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                      isActive("/admin")
+                        ? "bg-brand-50 text-brand-700 shadow-sm"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-brand-600"
+                    }`}
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Equipe Interna
+                  </Link>
+                  <Link
+                    to="/admin/cleaners"
+                    className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
+                      isActive("/admin/cleaners")
+                        ? "bg-brand-50 text-brand-700 shadow-sm"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-brand-600"
+                    }`}
+                  >
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Profissionais
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              title="Sair do sistema"
+            >
+              <span className="hidden sm:block mr-2">Sair</span>
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </nav>
+    </div>
   );
 }

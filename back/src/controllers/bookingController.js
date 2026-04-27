@@ -12,7 +12,7 @@ export const getAllBookings = async (req, res) => {
 };
 
 export const createBooking = async (req, res) => {
-  const { clientName, clientEmail, serviceDate, notes, cleanerId } = req.body;
+  const { clientName, clientEmail, serviceDate, notes, cleanerId, serviceType } = req.body;
   try {
     const bookingDate = new Date(serviceDate);
 
@@ -38,6 +38,7 @@ export const createBooking = async (req, res) => {
         serviceDate: bookingDate,
         notes,
         cleanerId: cleanerId ? parseInt(cleanerId) : null,
+        serviceType: serviceType || "residential",
       },
     });
     res.status(201).json(newBooking);
@@ -48,7 +49,7 @@ export const createBooking = async (req, res) => {
 
 export const updateBooking = async (req, res) => {
   const { id } = req.params;
-  const { clientName, clientEmail, serviceDate, notes, cleanerId, status } = req.body;
+  const { clientName, clientEmail, serviceDate, notes, cleanerId, status, serviceType } = req.body;
   try {
     const updatedBooking = await prisma.booking.update({
       where: { id: parseInt(id) },
@@ -59,6 +60,7 @@ export const updateBooking = async (req, res) => {
         notes,
         cleanerId: cleanerId ? parseInt(cleanerId) : null,
         status,
+        serviceType: serviceType || "residential",
       },
     });
     res.json(updatedBooking);

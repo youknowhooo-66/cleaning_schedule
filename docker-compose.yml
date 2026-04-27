@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: schedule_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cleaning_schedule
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d cleaning_schedule"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: schedule_backend
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://admin:password@db:5432/cleaning_schedule?schema=public
+      - PORT=5001
+      - JWT_SECRET=sua_chave_secreta_aqui
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./back:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: schedule_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+    depends_on:
+      - backend
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

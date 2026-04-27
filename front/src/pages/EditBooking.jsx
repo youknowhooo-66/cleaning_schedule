@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCleaners, updateBooking, getBookings } from '../api/api'; // Assuming getBookingById exists or can be derived from getBookings
+import { getCleaners, updateBooking, getBookings } from '../services/api';
 import BookingForm from '../components/BookingForm';
+import { ArrowLeft, Edit } from 'lucide-react';
+import { toast } from "react-toastify";
 
 export default function EditBooking() {
   const { id } = useParams();
@@ -41,27 +43,65 @@ export default function EditBooking() {
   async function handleSubmit(formData) {
     try {
       await updateBooking(id, formData);
+      toast.success("Agendamento atualizado com sucesso!");
       navigate('/bookings');
     } catch (err) {
-      setError("Erro ao atualizar agendamento: " + err.message);
+      toast.error("Erro ao atualizar agendamento: " + (err.response?.data?.error || err.message));
     }
   }
 
-  if (loading) return <div>Carregando...</div>;
-  if (error) return <div>Erro: {error}</div>;
-  if (!booking) return <div>Agendamento não disponível.</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+  );
+  if (error) return (
+    <div className="max-w-3xl mx-auto p-4 text-center">
+      <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200">
+        <p className="font-medium">{error}</p>
+        <button onClick={() => navigate('/bookings')} className="mt-4 text-sm underline hover:text-red-800">Voltar para listagem</button>
+      </div>
+    </div>
+  );
+  if (!booking) return null;
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Editar Agendamento</h1>
-      <div className="bg-white p-6 rounded-2xl shadow">
-        <BookingForm onSubmit={handleSubmit} bookingSelecionado={booking} cleaners={cleaners} />
-        <button
-          onClick={() => navigate('/bookings')}
-          className="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition"
-        >
-          Cancelar
-        </button>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 animate-in slide-in-from-bottom-4 duration-500">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <button
+            onClick={() => navigate("/bookings")}
+            className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors mb-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Voltar
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+              <Edit className="w-6 h-6 text-yellow-600" />
+            </div>
+            Editar Agendamento #{booking.id}
+          </h1>
+          <p className="mt-2 text-sm text-gray-500">
+            Atualize as informações do agendamento de {booking.clientName}.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-50 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+        <div className="relative z-10">
+          <BookingForm onSubmit={handleSubmit} bookingSelecionado={booking} cleaners={cleaners} />
+          
+          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+             <button
+              onClick={() => navigate('/bookings')}
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Cancelar Edição
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

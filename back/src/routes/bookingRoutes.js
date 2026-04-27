@@ -6,8 +6,11 @@ import {
   updateBookingStatus,
   deleteBooking,
 } from '../controllers/bookingController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 router.get('/', getAllBookings);
 router.post('/', createBooking);

@@ -15,15 +15,15 @@ enum TipoUsuario {
 }
 
 model Usuario {
-  id           Int         @id @default(autoincrement())
-  nome         String
-  email        String      @unique
-  senha        String
-  ativo        Boolean     @default(true)
-  tipoUsuario  TipoUsuario @default(USER)
-  resetToken       String?
+  id                Int         @id @default(autoincrement())
+  nome              String
+  email             String      @unique
+  senha             String
+  ativo             Boolean     @default(true)
+  tipoUsuario       TipoUsuario @default(USER)
+  resetToken        String?
   resetTokenExpires DateTime?
-
+  cleaners          Cleaner[]
 
   @@map("usuario")
 }
@@ -33,12 +33,13 @@ model Cleaner {
   name      String
   email     String    @unique
   phone     String?
+  admin     Usuario?  @relation(fields: [adminId], references: [id])
+  adminId   Int?
   bookings  Booking[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-
-    @@map("cleaner")
+  @@map("cleaner")
 }
 
 model Booking {
@@ -50,11 +51,9 @@ model Booking {
   cleaner     Cleaner? @relation(fields: [cleanerId], references: [id])
   cleanerId   Int?
   notes       String?
+  serviceType String   @default("residential")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-
-    @@map("booking")
+  @@map("booking")
 }
-
-

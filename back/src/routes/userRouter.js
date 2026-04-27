@@ -8,6 +8,7 @@ import { criarUsuario,
          atualizarUsuario,
          deletarUsuario 
          } from "../controllers/UsuariosController.js"
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 export const usuarioRouter = Router();
 
@@ -19,10 +20,10 @@ usuarioRouter.post("/esqueci-senha", esqueciSenha);
 
 usuarioRouter.post("/resetar-senha", resetarSenha);
 
-usuarioRouter.get("/:id", buscarUsuario);
+usuarioRouter.get("/:id", authMiddleware, buscarUsuario);
 
-usuarioRouter.get("/", listarUsuarios);
+usuarioRouter.get("/", authMiddleware, listarUsuarios);
 
-usuarioRouter.put("/:id", atualizarUsuario);
+usuarioRouter.put("/:id", authMiddleware, atualizarUsuario);
 
-usuarioRouter.delete("/:id", deletarUsuario);
+usuarioRouter.delete("/:id", authMiddleware, deletarUsuario);
