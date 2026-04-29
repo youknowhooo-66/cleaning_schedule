@@ -4,6 +4,7 @@ import api  from '../services/api';
 import UsuarioForm from '../components/UsuarioForm/UsuarioForm';
 import { toast } from 'react-toastify';
 import { ArrowLeft, UserCog } from 'lucide-react';
+import { getUser, saveUser } from '../utils/auth';
 
 export default function EditUsuario() {
   const { id } = useParams();
@@ -28,6 +29,16 @@ export default function EditUsuario() {
   async function handleSubmit(formData) {
     try {
       await api.put(`/usuario/${id}`, formData);
+      
+      const loggedUser = getUser();
+      if (loggedUser && (loggedUser.usuario?.id === parseInt(id) || loggedUser.id === parseInt(id))) {
+        const updatedUser = { 
+          ...loggedUser, 
+          usuario: { ...(loggedUser.usuario || loggedUser), nome: formData.nome } 
+        };
+        saveUser(updatedUser);
+      }
+
       toast.success("Usuário atualizado com sucesso!");
       navigate('/admin');
     } catch (err) {

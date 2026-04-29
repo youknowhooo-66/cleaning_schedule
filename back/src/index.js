@@ -3,8 +3,6 @@ dotenv.config();
 
 console.log('Dotenv configured');
 
-process.env.GEMINI_API_KEY
-
 import app from './app.js';
 
 const PORT = process.env.PORT || 5001;

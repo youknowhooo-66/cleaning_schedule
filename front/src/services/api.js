@@ -3,7 +3,7 @@ import { logout, getUser } from "../utils/auth";
 import { toast } from "react-toastify";
 
 const api = axios.create({
-  baseURL: "http://localhost:5001/api"
+  baseURL: "http://localhost:5000/api"
 });
 
 // Interceptor para adicionar o token em todas as requisições
